@@ -17,9 +17,15 @@ limitations under the License.
 */}}
 
 set -ex
+COMMAND="${@:-start}"
 
-nova-manage cell_v2 map_cell0  
-nova-manage cell_v2 simple_cell_setup
-nova-manage api_db sync
-nova-manage db sync
-nova-manage db online_data_migrations
+function start () {
+  exec nova-placement-api \
+        --port {{ .Values.network.placement.port }}
+}
+
+function stop () {
+  kill -TERM 1
+}
+
+$COMMAND

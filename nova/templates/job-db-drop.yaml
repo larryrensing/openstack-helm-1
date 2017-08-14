@@ -95,6 +95,35 @@ spec:
               mountPath: /etc/nova/nova.conf
               subPath: nova.conf
               readOnly: true
+        - name: nova-db-drop-cell0
+          image: {{ .Values.images.tags.db_drop }}
+          imagePullPolicy: {{ .Values.images.pull_policy }}
+{{ tuple $envAll $envAll.Values.pod.resources.jobs.db_drop | include "helm-toolkit.snippets.kubernetes_resources" | indent 10 }}
+          env:
+            - name: ROOT_DB_CONNECTION
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secrets.oslo_db.admin }}
+                  key: DB_CONNECTION
+            - name: OPENSTACK_CONFIG_FILE
+              value: /etc/nova/nova.conf
+            - name: OPENSTACK_CONFIG_DB_SECTION
+              value: cell_database
+            - name: OPENSTACK_CONFIG_DB_KEY
+              value: connection
+          command:
+            - /tmp/db-drop.py
+          volumeMounts:
+            - name: nova-bin
+              mountPath: /tmp/db-drop.py
+              subPath: db-drop.py
+              readOnly: true
+            - name: etcnova
+              mountPath: /etc/nova
+            - name: nova-etc
+              mountPath: /etc/nova/nova.conf
+              subPath: nova.conf
+              readOnly: true
       volumes:
         - name: etcnova
           emptyDir: {}
