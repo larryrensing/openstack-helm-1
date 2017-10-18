@@ -101,8 +101,10 @@ spec:
           - name: keystone-fernet-keys
             mountPath: {{ .Values.conf.keystone.fernet_tokens.key_repository }}
 {{- end }}
+{{ if .Values.conf.keystone.credential.enabled }}
           - name: keystone-credential-keys
             mountPath: {{ .Values.conf.keystone.credential.key_repository }}
+{{ end }}
 {{ if $mounts_keystone_api.volumeMounts }}{{ toYaml $mounts_keystone_api.volumeMounts | indent 10 }}{{ end }}
       volumes:
       - name: etckeystone
@@ -122,8 +124,10 @@ spec:
         secret:
           secretName: keystone-fernet-keys
 {{- end }}
+{{ if .Values.conf.keystone.credential.enabled }}
       - name: keystone-credential-keys
         secret:
           secretName: keystone-credential-keys
+{{ end }}
 {{ if $mounts_keystone_api.volumes }}{{ toYaml $mounts_keystone_api.volumes | indent 6 }}{{ end }}
 {{- end }}
