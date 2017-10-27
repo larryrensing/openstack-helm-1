@@ -19,6 +19,8 @@ limitations under the License.
 set -ex
 
 keystone-manage --config-file=/etc/keystone/keystone.conf db_sync
+keystone-manage --config-file=/etc/keystone/keystone.conf db_sync --expand
+keystone-manage --config-file=/etc/keystone/keystone.conf db_sync --migrate
 
 keystone-manage --config-file=/etc/keystone/keystone.conf bootstrap \
     --bootstrap-username ${OS_USERNAME} \

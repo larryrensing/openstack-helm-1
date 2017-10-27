@@ -44,6 +44,8 @@ spec:
 {{ tuple $envAll $dependencies $mounts_nova_placement_init | include "helm-toolkit.snippets.kubernetes_entrypoint_init_container" | indent 8 }}
       containers:
         - name: nova-placement-api
+          securityContext:
+            runAsUser: {{ .Values.pod.user.nova.uid }}
           image: {{ .Values.images.tags.placement }}
           imagePullPolicy: {{ .Values.images.pull_policy }}
 {{ tuple $envAll $envAll.Values.pod.resources.placement | include "helm-toolkit.snippets.kubernetes_resources" | indent 10 }}

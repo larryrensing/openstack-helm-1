@@ -46,6 +46,7 @@ spec:
           imagePullPolicy: {{ .Values.images.pull_policy }}
           securityContext:
             runAsUser: 0
+            privileged: true
           env:
             - name: NOVA_USER_UID
               value: "{{ .Values.pod.user.nova.uid }}"
@@ -101,6 +102,20 @@ spec:
               readOnly: true
             - name: pod-shared
               mountPath: /tmp/pod-shared
+        - name: nova-compute-perms
+          image: {{ .Values.images.tags.compute }}
+          imagePullPolicy: {{ .Values.images.pull_policy }}
+{{ tuple $envAll $envAll.Values.pod.resources.compute | include "helm-toolkit.snippets.kubernetes_resources" | indent 10 }}
+          securityContext:
+            runAsUser: 0
+            privileged: true
+          command:
+            - /tmp/nova-perms-init.sh
+          volumeMounts:
+            - name: nova-bin
+              mountPath: /tmp/nova-perms-init.sh
+              subPath: nova-perms-init.sh
+              readOnly: true
       containers:
         - name: nova-compute
           image: {{ .Values.images.tags.compute }}
