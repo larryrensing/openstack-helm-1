@@ -1,0 +1,53 @@
+{{/*
+Copyright 2017 The Openstack-Helm Authors.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/}}
+
+{{- if .Values.manifests.deployment_mysql_exporter }}
+{{- $envAll := . }}
+{{- $mariadb_user := .Values.endpoints.oslo_db.auth.admin.username }}
+{{- $mariadb_pass := .Values.endpoints.oslo_db.auth.admin.password }}
+{{- $mariadb_fqdn := tuple "oslo_db" "internal" . | include "helm-toolkit.endpoints.hostname_fqdn_endpoint_lookup" }}
+{{- $mariadb_port := tuple "oslo_db" "internal" "mysql" . | include "helm-toolkit.endpoints.endpoint_port_lookup" }}
+{{- $mysql_data_source := printf "%s:%s@(%s:%s)/" $mariadb_user $mariadb_pass $mariadb_fqdn $mariadb_port }}
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: prometheus-mysql-exporter
+  namespace: {{ .Values.endpoints.mysql_exporter.namespace }}
+spec:
+  replicas: {{ .Values.pod.replicas.mysql_exporter }}
+{{ tuple $envAll | include "helm-toolkit.snippets.kubernetes_upgrades_deployment" | indent 2 }}
+  template:
+    metadata:
+      labels:
+{{ tuple $envAll "mysql" "exporter" | include "helm-toolkit.snippets.kubernetes_metadata_labels" | indent 8 }}
+      namespace: {{ .Values.endpoints.mysql_exporter.namespace }}
+    spec:
+      nodeSelector:
+        {{ .Values.labels.mysql_exporter.node_selector_key }}: {{ .Values.labels.mysql_exporter.node_selector_value }}
+      terminationGracePeriodSeconds: {{ .Values.pod.lifecycle.termination_grace_period.timeout | default "30" }}
+      containers:
+      - name: mysql-exporter
+        image: {{ .Values.images.tags.mysql_exporter }}
+        imagePullPolicy: {{ .Values.images.pull_policy }}
+{{ tuple $envAll $envAll.Values.pod.resources.mysql_exporter | include "helm-toolkit.snippets.kubernetes_resources" | indent 10 }}
+        ports:
+        - name: metrics
+          containerPort: {{ .Values.network.mysql_exporter.port }}
+        env:
+        - name: DATA_SOURCE_NAME
+          value: {{ $mysql_data_source | quote }}
+{{- end }}
