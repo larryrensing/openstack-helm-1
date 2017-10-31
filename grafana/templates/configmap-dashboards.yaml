@@ -1,0 +1,49 @@
+{{/*
+Copyright 2017 The Openstack-Helm Authors.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/}}
+
+{{- if .Values.manifests.configmap_dashboards }}
+{{- $envAll := . }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-dashboards
+data:
+  ceph_cluster.json: |+
+{{ toJson .Values.conf.dashboards.ceph_cluster | indent 4 }}
+  ceph_osd.json: |+
+{{ toJson .Values.conf.dashboards.ceph_osd | indent 4 }}
+  ceph_pool.json: |+
+{{ toJson .Values.conf.dashboards.ceph_pool | indent 4 }}
+  etcd.json: |+
+{{ toJson .Values.conf.dashboards.etcd | indent 4 }}
+  hosts_containers.json: |+
+{{ toJson .Values.conf.dashboards.hosts_containers | indent 4 }}
+  kubernetes_metrics.json: |+
+{{ toJson .Values.conf.dashboards.kubernetes_metrics | indent 4 }}
+  kubernetes_cluster_health.json: |+
+{{ toJson .Values.conf.dashboards.kubernetes_cluster_health | indent 4 }}
+  kubernetes_cluster_status.json: |+
+{{ toJson .Values.conf.dashboards.kubernetes_cluster_status | indent 4 }}
+  kubernetes_control_plane.json: |+
+{{ toJson .Values.conf.dashboards.kubernetes_control_plane | indent 4 }}
+  kubernetes_capacity_planning.json: |+
+{{ toJson .Values.conf.dashboards.kubernetes_capacity_planning | indent 4 }}
+  nodes.json: |+
+{{ toJson .Values.conf.dashboards.nodes | indent 4 }}
+  rabbitmq.json: |+
+{{ toJson .Values.conf.dashboards.rabbitmq | indent 4 }}
+{{- end }}

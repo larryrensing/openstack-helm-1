@@ -1,0 +1,115 @@
+{{/*
+Copyright 2017 The Openstack-Helm Authors.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/}}
+
+{{- if .Values.manifests.deployment_grafana }}
+{{- $envAll := . }}
+{{- $dependencies := .Values.dependencies.grafana }}
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: grafana
+spec:
+  replicas: {{ .Values.pod.replicas.grafana }}
+{{ tuple $envAll | include "helm-toolkit.snippets.kubernetes_upgrades_deployment" | indent 2 }}
+  template:
+    metadata:
+      labels:
+{{ tuple $envAll "grafana" "dashboard" | include "helm-toolkit.snippets.kubernetes_metadata_labels" | indent 8 }}
+      annotations:
+        configmap-etc-hash: {{ tuple "configmap-etc.yaml" . | include "helm-toolkit.utils.hash" }}
+    spec:
+      initContainers:
+{{ tuple $envAll $dependencies "[]" | include "helm-toolkit.snippets.kubernetes_entrypoint_init_container"  | indent 8 }}
+      containers:
+      - name: grafana
+        image: {{ .Values.images.tags.grafana }}
+        imagePullPolicy: {{ .Values.images.pull_policy }}
+{{ tuple $envAll $envAll.Values.pod.resources.grafana | include "helm-toolkit.snippets.kubernetes_resources" | indent 10 }}
+        ports:
+        - name: dashboard
+          containerPort: {{ .Values.network.grafana.port }}
+          protocol: TCP
+        readinessProbe:
+          httpGet:
+            path: /login
+            port: 3000
+          initialDelaySeconds: 30
+          timeoutSeconds: 30
+        volumeMounts:
+        - name: etcgrafana
+          mountPath: /etc/grafana
+        - name: grafana-etc
+          mountPath: /etc/grafana/grafana.ini
+          subPath: grafana.ini
+        - name: grafana-etc
+          mountPath: /etc/grafana/ldap.toml
+          subPath: ldap.toml
+        - name: grafana-dashboards
+          mountPath: /var/lib/grafana/dashboards/ceph_cluster.json
+          subPath: ceph_cluster.json
+        - name: grafana-dashboards
+          mountPath: /var/lib/grafana/dashboards/ceph_osd.json
+          subPath: ceph_osd.json
+        - name: grafana-dashboards
+          mountPath: /var/lib/grafana/dashboards/ceph_pool.json
+          subPath: ceph_pool.json
+        - name: grafana-dashboards
+          mountPath: /var/lib/grafana/dashboards/etcd.json
+          subPath: etcd.json
+        - name: grafana-dashboards
+          mountPath: /var/lib/grafana/dashboards/hosts_containers.json
+          subPath: hosts_containers.json
+        - name: grafana-dashboards
+          mountPath: /var/lib/grafana/dashboards/kubernetes_metrics.json
+          subPath: kubernetes_metrics.json
+        - name: grafana-dashboards
+          mountPath: /var/lib/grafana/dashboards/rabbitmq.json
+          subPath: rabbitmq.json
+        - name: grafana-dashboards
+          mountPath: /var/lib/grafana/dashboards/kubernetes_cluster_health.json
+          subPath: kubernetes_cluster_health.json
+        - name: grafana-dashboards
+          mountPath: /var/lib/grafana/dashboards/kubernetes_cluster_status.json
+          subPath: kubernetes_cluster_status.json
+        - name: grafana-dashboards
+          mountPath: /var/lib/grafana/dashboards/kubernetes_control_plane.json
+          subPath: kubernetes_control_plane.json
+        - name: grafana-dashboards
+          mountPath: /var/lib/grafana/dashboards/kubernetes_capacity_planning.json
+          subPath: kubernetes_capacity_planning.json
+        - name: grafana-dashboards
+          mountPath: /var/lib/grafana/dashboards/nodes.json
+          subPath: nodes.json
+        - name: data
+          mountPath: /var/lib/grafana/data
+        - name: logs
+          mountPath: /var/log/grafana
+      volumes:
+      - name: etcgrafana
+        emptyDir: {}
+      - name: grafana-etc
+        configMap:
+          name: grafana-etc
+          defaultMode: 0444
+      - name: grafana-dashboards
+        configMap:
+          name: grafana-dashboards
+      - name: data
+        emptyDir: {}
+      - name: logs
+        emptyDir: {}
+{{- end }}
