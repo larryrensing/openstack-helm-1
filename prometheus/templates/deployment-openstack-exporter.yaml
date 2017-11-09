@@ -16,7 +16,7 @@ limitations under the License.
 
 {{- if .Values.manifests.deployment_openstack_exporter }}
 {{- $envAll := . }}
-{{- $ksUserSecret := .Values.secrets.identity.user }}
+{{- $ksUserSecret := .Values.secrets.identity.admin }}
 ---
 apiVersion: extensions/v1beta1
 kind: Deployment
@@ -53,7 +53,7 @@ spec:
           - name: os-var
             mountPath: /var/cache/prometheus-openstack-exporter
           - name: os-exporter-etc
-            mountPath: /etc/prometheus/prometheus-openstack-exporter.yaml
+            mountPath: /etc/prometheus-openstack-exporter/prometheus-openstack-exporter.yaml
             subPath: prometheus-openstack-exporter.yaml
             readOnly: true
       volumes:

@@ -94,6 +94,9 @@ spec:
         - name: grafana-dashboards
           mountPath: /var/lib/grafana/dashboards/nodes.json
           subPath: nodes.json
+        - name: grafana-dashboards
+          mountPath: /var/lib/grafana/dashboards/openstack_overview.json
+          subPath: openstack_overview.json
         - name: data
           mountPath: /var/lib/grafana/data
         - name: logs
