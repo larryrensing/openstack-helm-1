@@ -156,7 +156,6 @@ secrets:
     admin: ceph-client-admin-keyring
   identity:
     admin: keystone-keystone-admin
-#    user: prometheus-nova-keystone-user
 
 endpoints:
   cluster_domain_suffix: cluster.local
