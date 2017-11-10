@@ -46,4 +46,6 @@ data:
 {{ toJson .Values.conf.dashboards.nodes | indent 4 }}
   rabbitmq.json: |+
 {{ toJson .Values.conf.dashboards.rabbitmq | indent 4 }}
+  openstack_overview.json: |+
+{{ toJson .Values.conf.dashboards.openstack_overview | indent 4 }}
 {{- end }}

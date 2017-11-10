@@ -28,7 +28,7 @@ images:
     mysql_exporter: prom/mysqld-exporter:v0.10.0
     prometheus: docker.io/prom/prometheus:v1.7.1
     helm_tests: docker.io/kolla/ubuntu-source-kolla-toolbox:3.0.3
-    openstack_exporter: srwilkers/openstack-exporter:v0.2.1
+    openstack_exporter: slarimore02/prometheus-openstack-exporter:latest
   pull_policy: IfNotPresent
 
 labels:
@@ -155,7 +155,7 @@ secrets:
   keyrings:
     admin: ceph-client-admin-keyring
   identity:
-    user: prometheus-nova-keystone-user
+    admin: keystone-keystone-admin
 
 endpoints:
   cluster_domain_suffix: cluster.local
