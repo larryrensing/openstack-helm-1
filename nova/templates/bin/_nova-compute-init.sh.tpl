@@ -22,4 +22,4 @@ set -ex
 mkdir -p /var/lib/nova/instances
 
 # Set Ownership of nova dirs to the nova user
-chown ${NOVA_USER_UID} /var/lib/nova /var/lib/nova/instances
+chown {{ .Values.pod.user.nova.uid }}:{{ .Values.pod.user.nova.uid }} /var/lib/nova /var/lib/nova/instances

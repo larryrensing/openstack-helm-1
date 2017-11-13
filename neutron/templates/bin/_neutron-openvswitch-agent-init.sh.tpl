@@ -18,7 +18,7 @@ limitations under the License.
 
 set -ex
 
-chown neutron: /run/openvswitch/db.sock
+chown {{ .Values.pod.user.neutron.uid }}:{{ .Values.pod.user.neutron.uid }} /run/openvswitch/db.sock
 
 # ensure we can talk to openvswitch or bail early
 # this is until we can setup a proper dependency
